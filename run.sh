@@ -7,6 +7,14 @@ trap "pkill -SIGTERM -P $$; kill -SIGKILL $$" SIGINT SIGTERM SIGKILL SIGQUIT EXI
 
 HELP_TXT="Usage: `basename $0`"$'\n'
 
+
+#-------------------------------------------------------------------------------
+# Prepare BASE VMs
+#-------------------------------------------------------------------------------
+if [ "$MULTI_BASE" = true ] ; then
+  ./build_vm.sh -n $BASE_COUNT -f -y
+fi
+
 ./test_cases.sh &
 TEST_CASES_PID=$!
 

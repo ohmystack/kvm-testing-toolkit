@@ -1,13 +1,22 @@
-export VM_COUNT=50
+export BASE_COUNT=5      # Number of VMs used as BASEs
+export VM_COUNT=10       # Number of VMs linked clone from each BASE image
+
 export BASE_VM="win7_sh_Hotel_2.4.0_base"
 export BASE_DISK="/vdesktop/base/win7_sh_Hotel_2.4.0.qcow2"
 export DISK_DIR="/vdesktop/instances"
-export SLEEP_TIME=1
+export SLEEP_TIME=0.5
+
+if [ "${BASE_COUNT}" -gt 1 ] ; then
+  export MULTI_BASE=true
+else
+  export MULTI_BASE=false
+fi
 
 # Run configurations
-export ALWAYS_YES=0
-export SLEEP_AFTER_BUILD=60
-export SLEEP_AFTER_START=600
+export ALWAYS_YES=false
+export FULL_CLONE=false
+export SLEEP_AFTER_BUILD=120
+export SLEEP_AFTER_START=900
 export SLEEP_AFTER_LOGOUT=300
 export SLEEP_AFTER_SHUTDOWN=180
 export SLEEP_AFTER_DELETE=15

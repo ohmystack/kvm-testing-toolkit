@@ -1,6 +1,7 @@
 #!/bin/bash - 
 
 source conf.sh
+source utils.sh
 
 set -o nounset                              # Treat unset variables as an error
 
@@ -13,11 +14,13 @@ while getopts ':b:d:y' OPT; do
     d)
       DIST_DIR="$OPTARG";;
     y)
-      ALWAYS_YES=1;;
+      ALWAYS_YES=true;;
     ?)
       echo "${HELP_TXT}"
   esac
 done
+
+ALWAYS_YES=${ALWAYS_YES:-false}
 
 if [ -z "${BASE_VM+x}" ] || [ -z "${DISK_DIR+x}" ]; then
   echo "Error: Missing params..."
@@ -25,27 +28,55 @@ if [ -z "${BASE_VM+x}" ] || [ -z "${DISK_DIR+x}" ]; then
   exit 1
 fi
 
-cmd_get_vms="virsh list --all | sed '1d; \$d' | awk '\$2 ~ /^${BASE_VM}_[0-9]+\$/ {print \$2}'"
+linked_vms=($(get_linked_vms))
+base_vms=($(get_base_vms))
 
-vms=`eval ${cmd_get_vms}`
-
-echo "${vms}"
+echo "Linked VMs:"
+if [ ! ${#linked_vms[@]} -eq 0 ] ; then
+  print_array "${linked_vms[@]}"
+else
+  echo "(no such vm)"
+fi
+echo
+echo "Base VMs:"
+if [ ! ${#base_vms[@]} -eq 0 ] ; then
+  print_array "${base_vms[@]}"
+else
+  echo "(no such vm)"
+fi
 echo
 
-delete_func ()
+delete_vm_func ()
 {
-  echo "${vms}" | xargs -t -I '{}' virsh destroy '{}'
-  echo "${vms}" | xargs -t -I '{}' virsh undefine '{}'
-  echo "${vms}" | xargs -t -I '{}' rm "${DISK_DIR}/"'{}'".qcow2"
+  if [ $# -lt 1 ] ; then
+    return
+  fi
+  for i in "$@" ; do
+    echo "Deleting $i"
+    virsh destroy $i
+    virsh undefine $i
+    rm ${DISK_DIR}/${i}.qcow2
+  done
 }	# ----------  end of function delete_func  ----------
 
-if [[ "${ALWAYS_YES}" = 1 ]]; then
-  delete_func
+
+delete_all_vms ()
+{
+  if [ ! ${#linked_vms[@]} -eq 0 ] ; then
+    delete_vm_func "${linked_vms[@]}"
+  fi
+  if [ ! ${#base_vms[@]} -eq 0 ] ; then
+    delete_vm_func "${base_vms[@]}"
+  fi
+}	# ----------  end of function delete_all_vms  ----------
+
+if [ "${ALWAYS_YES}" = true ]; then
+  delete_all_vms
 else
   read -p "Delete these VMs? (y/n)" QUESTION
   echo
   if [[ "${QUESTION}" =~ ^[Yy]$ ]]; then
-    delete_func
+    delete_all_vms
   else
     exit 0
   fi

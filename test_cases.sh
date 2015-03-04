@@ -1,6 +1,7 @@
 #!/bin/bash - 
 
 source conf.sh
+source utils.sh
 
 set -o nounset     # Treat unset variables as an error
 set -e             # Exit immediately if a command exits with a non-zero status
@@ -19,73 +20,95 @@ fi
 # Build VMs
 #-------------------------------------------------------------------------------
 echo "[`date`] Start to build VMs." >> "${log_path}"
-./build_vm.sh -y &
-echo "===> [`date`] Sleep ""${SLEEP_AFTER_BUILD}""s after building VMs."
+if [ "$MULTI_BASE" = true ] ; then
+  for i in $(seq 1 $BASE_COUNT) ; do
+    _base_name=${BASE_VM}_base${i}
+    _base_disk=${DISK_DIR}/${_base_name}.qcow2
+    ./build_vm.sh -n $VM_COUNT -b ${_base_name} -o ${_base_disk} -y &
+  done
+else
+  ./build_vm.sh -y &
+fi
+echo "===> [`date`] Sleep ${SLEEP_AFTER_BUILD}s after building VMs."
 sleep "${SLEEP_AFTER_BUILD}"
+
+clean_sys_cache
 
 #-------------------------------------------------------------------------------
 # Start VMs
 #-------------------------------------------------------------------------------
 echo "[`date`] Start VMs." >> "${log_path}"
 ./action_vm.sh -y start &
-echo "===> [`date`] Sleep ""${SLEEP_AFTER_START}""s after starting VMs."
-sleep "${SLEEP_AFTER_START}"
+echo "===> [`date`] Sleep ${SLEEP_AFTER_START}s after starting VMs."
+sleep "${SLEEP_AFTER_START}" &
+wait $!
 
 #-------------------------------------------------------------------------------
 # Logout
 #-------------------------------------------------------------------------------
 echo "[`date`] Start to logout." >> "${log_path}"
 ./logout_vm.sh -y &
-echo "===> [`date`] Sleep ""${SLEEP_AFTER_LOGOUT}""s after logout."
-sleep "${SLEEP_AFTER_LOGOUT}"
+echo "===> [`date`] Sleep ${SLEEP_AFTER_LOGOUT}s after logout."
+sleep "${SLEEP_AFTER_LOGOUT}" &
+wait $!
 
 #-------------------------------------------------------------------------------
 # Shutdown VMs
 #-------------------------------------------------------------------------------
 echo "[`date`] Start to shutdown VMs." >> "${log_path}"
 ./action_vm.sh -y shutdown &
-echo "===> [`date`] Sleep ""${SLEEP_AFTER_SHUTDOWN}""s after shutting down VMs."
-sleep "${SLEEP_AFTER_SHUTDOWN}"
+echo "===> [`date`] Sleep ${SLEEP_AFTER_SHUTDOWN}s after shutting down VMs."
+sleep "${SLEEP_AFTER_SHUTDOWN}" &
+wait $!
+
+clean_sys_cache
 
 #-------------------------------------------------------------------------------
 # Start VMs - 2nd
 #-------------------------------------------------------------------------------
 echo "[`date`] Start VMs." >> "${log_path}"
 ./action_vm.sh -y start &
-echo "===> [`date`] Sleep ""${SLEEP_AFTER_START}""s after starting VMs."
-sleep "${SLEEP_AFTER_START}"
+echo "===> [`date`] Sleep ${SLEEP_AFTER_START}s after starting VMs."
+sleep "${SLEEP_AFTER_START}" &
+wait $!
 
 #-------------------------------------------------------------------------------
 # Shutdown VMs - 2nd
 #-------------------------------------------------------------------------------
 echo "[`date`] Start to shutdown VMs." >> "${log_path}"
 ./action_vm.sh -y shutdown &
-echo "===> [`date`] Sleep ""${SLEEP_AFTER_SHUTDOWN}""s after shutting down VMs."
-sleep "${SLEEP_AFTER_SHUTDOWN}"
+echo "===> [`date`] Sleep ${SLEEP_AFTER_SHUTDOWN}s after shutting down VMs."
+sleep "${SLEEP_AFTER_SHUTDOWN}" &
+wait $!
+
+clean_sys_cache
 
 #-------------------------------------------------------------------------------
 # Start VMs - 3rd
 #-------------------------------------------------------------------------------
 echo "[`date`] Start VMs." >> "${log_path}"
 ./action_vm.sh -y start &
-echo "===> [`date`] Sleep ""${SLEEP_AFTER_START}""s after starting VMs."
-sleep "${SLEEP_AFTER_START}"
+echo "===> [`date`] Sleep ${SLEEP_AFTER_START}s after starting VMs."
+sleep "${SLEEP_AFTER_START}" &
+wait $!
 
 #-------------------------------------------------------------------------------
 # Shutdown VMs - 3rd
 #-------------------------------------------------------------------------------
 echo "[`date`] Start to shutdown VMs." >> "${log_path}"
 ./action_vm.sh -y shutdown &
-echo "===> [`date`] Sleep ""${SLEEP_AFTER_SHUTDOWN}""s after shutting down VMs."
-sleep "${SLEEP_AFTER_SHUTDOWN}"
+echo "===> [`date`] Sleep ${SLEEP_AFTER_SHUTDOWN}s after shutting down VMs."
+sleep "${SLEEP_AFTER_SHUTDOWN}" &
+wait $!
 
 #-------------------------------------------------------------------------------
 # Delete VMs
 #-------------------------------------------------------------------------------
 echo "[`date`] Start to delete VMs." >> "${log_path}"
 ./delete_vm.sh -y &
-echo "===> [`date`] Sleep ""${SLEEP_AFTER_DELETE}""s after deleting VMs."
-sleep "${SLEEP_AFTER_DELETE}"
+echo "===> [`date`] Sleep ${SLEEP_AFTER_DELETE}s after deleting VMs."
+sleep "${SLEEP_AFTER_DELETE}" &
+wait $!
 
 echo
 echo "===> Done!"
