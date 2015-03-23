@@ -13,6 +13,7 @@ else
 fi
 
 # Run configurations
+export TEST_CASE_SCRIPT='test_cases.sh'
 export ALWAYS_YES=false
 export FULL_CLONE=false
 export SLEEP_AFTER_BUILD=120
