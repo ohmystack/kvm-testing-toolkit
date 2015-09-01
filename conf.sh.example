@@ -1,9 +1,9 @@
-export BASE_COUNT=5      # Number of VMs used as BASEs
-export VM_COUNT=10       # Number of VMs linked clone from each BASE image
+export BASE_COUNT=1      # Number of VMs used as BASEs
+export VM_COUNT=5        # Number of VMs linked clone from each BASE image
 
-export BASE_VM="win7_sh_Hotel_2.4.0_base"
-export BASE_DISK="/vdesktop/base/win7_sh_Hotel_2.4.0.qcow2"
-export DISK_DIR="/vdesktop/instances"
+export BASE_VM="win7_base"
+export BASE_DISK="/testvms/base/win7_base.qcow2"
+export DISK_DIR="/testvms/instances"
 export SLEEP_TIME=0.5
 
 if [ "${BASE_COUNT}" -gt 1 ] ; then
@@ -13,7 +13,7 @@ else
 fi
 
 # Run configurations
-export TEST_CASE_SCRIPT='test_cases.sh'
+export TEST_CASE_SCRIPT='test_cases_simple.sh'
 export ALWAYS_YES=false
 export FULL_CLONE=false
 export SLEEP_AFTER_BUILD=120
@@ -22,7 +22,6 @@ export SLEEP_AFTER_LOGOUT=300
 export SLEEP_AFTER_SHUTDOWN=180
 export SLEEP_AFTER_DELETE=15
 
-export IOSTAT_INTERVAL=5
 export DATA_DIR='data'
 
 if [ ! -d ${DATA_DIR} ] ; then
@@ -31,6 +30,7 @@ if [ ! -d ${DATA_DIR} ] ; then
 fi
 
 # Data Analysis configurations
+export IOSTAT_INTERVAL=5
 export WATCH_DISKS=('sdb')
 
 # Memory Test
