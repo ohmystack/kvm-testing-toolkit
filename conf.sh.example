@@ -32,3 +32,6 @@ fi
 
 # Data Analysis configurations
 export WATCH_DISKS=('sdb')
+
+# Memory Test
+export FREE_INTERVAL=1
