@@ -4,9 +4,9 @@
 
 This toolkit can provide:
 
-* Batch ** build / start / logout / shutdown / destroy / delete ** VMs, using libvirt commands
+* Batch **build / start / logout / shutdown / destroy / delete** VMs, using libvirt commands
 * Linked clone support, you can control the proportion of Base VMs and Linked VMs
-* Record and analysis ** Disk / Memory ** data during the operations, and export to a CSV report
+* Record and analysis **Disk / Memory** data during the operations, and export to a CSV report
 
 ## Installation
 
@@ -36,7 +36,7 @@ Edit the `conf.sh` file, fill in correct info:
 #### General Config
 
 * `BASE_COUNT` : How many Base VMs will be created. But if `BASE_COUNT=1` , no more Base VMs will be created, because you already have one.
-* `VM_COUNT` : How manay VMs will be link-cloned from ** every Base VM ** .
+* `VM_COUNT` : How manay VMs will be link-cloned from **every Base VM**.
 * `BASE_VM` : e.g. Here is the `win7_base` .
 * `BASE_DISK` : The Base VM's disk file.
 * `DISK_DIR` : Where you want the NEW VMs' disk files to place at.
